@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: webdeployment
+  namespace: google
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      apptype: web
+      env: dev
+  template:
+    metadata:
+      name: webtemp
+      labels:
+        apptype: web
+        env: dev
+    spec:
+    - image: prasad193/webnew:v1
+      name: webcontainer
+      imagePullPolicy: Always
+      ports:
+      - name: apache
+        containerPort: 80
+        protocol: TCP
+      resources:
+        requests:
+          memory: "40i"
+          cpu: "40m"
+        limits:
+          memory: "50i"
+          cpu: "50m"
+---
+apiVersion: v1
+kind: service
+metadata:
+  name: webservice
+  namespace: google
+spec:
+  ports:
+  - name: apache
+    port: 80 #ServicePort
+    targetPort: 80 #ContainerPort
+    protocol: TCP
+  selector:
+    apptype: web
+    env: dev
+
+
+

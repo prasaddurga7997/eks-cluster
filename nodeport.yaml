@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapplication
+  namespace: google
+  labels:  #to map with the service
+    app: web
+    env: dev
+spec:
+  containers:
+  - name: webcontainer
+    image: prasad193/webnew:v1
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 80
+      name: apache
+      protocol: TCP
+    resources:
+          requests:
+            memory: "200Mi"
+            cpu: "200m"
+          limits:
+            memory: "400Mi"
+            cpu: "200m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webservice
+  namespace: google
+spec:
+  type: NodePort
+  ports:
+  - name: apache
+    nodePort: 30002
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:  #mapping to Pod
+    app: web
+    env: dev
+

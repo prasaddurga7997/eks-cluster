@@ -1,0 +1,193 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webdeployment
+  namespace: google
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apptype: web
+      env: dev
+  template:
+    metadata:
+      name: webtemp
+      labels:
+        apptype: web
+        env: dev
+    spec:
+      containers:
+      - image: prasad193/webnew:v1
+        name: webcontainer
+        imagePullPolicy: Always
+        ports:
+        - name: apache
+          containerPort: 80
+          protocol: TCP
+        resources:
+          memory: "200Mi"
+          cpu: "200m"
+        limits:
+          memory: "300Mi"
+          cpu: "400m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webservice
+  namespace: google
+spec:
+  ports:
+  - name: apache
+    port: 80 #servicePort
+    targetPort: 80 #ContainerPort
+    protocol: TCP
+  selector: #mapping to pod
+    apptype: web
+    env: dev
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bananadeployment
+  namespace: google
+spec:
+  replicas: 1
+  selector:
+    matchlabels:
+      apptype: banana
+      env: dev
+  template:
+    metadata:
+      name: bananatemp
+      labels:
+        apptype: banana
+        env: dev
+    spec:
+      containers:
+      - image: hashicorp/http-echo
+        args:
+          - "-text=banana"
+        name: bananacontainer
+        imagePullPolicy: Always
+        ports:
+        - name: apache
+          containerPort: 5678
+          protocol: TCP
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "200m"
+          limits:
+            memory: "300Mi"
+            cpu: "400m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bananaservice
+  namespace: google
+spec:
+  ports:
+  - name: apache
+    port: 80
+    targetPort: 5678
+    protocol: TCP
+  selector:
+    apptype: banana
+    env: dev
+---
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: appledeployment
+  namespace: google
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apptype: apple
+      env: dev
+  template:
+    metadata:
+      name: appletemp
+      labels:
+        apptype: apple
+        env: dev
+    spec:
+      containers:
+      - image: hashicorp/http-echo
+        args:
+          - "-text=apple"
+        name: applecontainer
+        imagePullPolicy: Always
+        ports:
+        - name: apache
+          containerPort: 5678
+          protocol: TCP
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "200m"
+          limits:
+            memory: "300Mi"
+            cpu: "400m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appleservice
+  namespace: google
+spec:
+  ports:
+  - name: apache
+    port: 80 #servicePort
+    targetPort: 5678 #ContainerPort
+    protocol: TCP
+  selector:
+    apptype: apple
+    env: dev
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webingress
+  namespace: google
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "www.prasadtech.online"
+    http:
+      paths:
+      - path: "/"
+        pathType: "Prefix"
+        backend:
+          service:
+            name: webservice
+            port:
+              number: 80
+  - host: "www.prasadtech.online"
+    http:
+      paths:
+      - path: "/banana"
+        pathType: "Prefix"
+        backend:
+          service:
+            name: bananaservice
+            port:
+              number: 80
+  - host: "www.prasadtech.online"
+    http:
+      paths:
+      - path: "/apple"
+        pathType: "Prefix"
+        backend:
+          service:
+             name: appleservice
+             port:
+               number: 80
+
+
+
+
+

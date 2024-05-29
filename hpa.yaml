@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webdeployment
+  namespace: google
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      apptype: web
+      env: dev
+  template:
+    metadata:
+      name: webtemplate
+      labels:
+        apptype: web
+        env: dev
+    spec:
+      containers:
+      - image: prasad193/webnew:v1
+        name: webcontainer
+        imagePullPolicy: Always
+        ports:
+        - name: apache
+          containerPort: 80
+          protocol: TCP
+        resources:
+          requests:
+            memory: "40Mi"
+            cpu: "30m"
+          limits:
+            memory: "50Mi"
+            cpu: "50m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webservice
+  namespace: google
+spec:
+  ports:
+  - name: apache
+    port: 80 #servicePort
+    containerPort: 80 #containerPort
+    protocol: TCP
+  selector:
+    apptype: web
+    env: dev
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webingress
+  namespace: google
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "www.prasadtech.online"
+    http:
+      paths:
+      - path: "/"
+        pathType: Prefix
+        backend:
+          service:
+            name: webservice
+            port:
+              number: 80
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: webhpa
+  namespace: google
+  spec:
+    maxReplicas: 3
+    minReplicas: 1
+    targetCPUUtilizationPercentage: 30
+    scaleTargetRef:
+      apiVersion: v1
+      kind: Deployment
+      name: webdeployment

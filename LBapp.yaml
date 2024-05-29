@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapplication
+  namespace: google
+  labels:
+    app: web
+    env: dev
+spec:
+  containers:
+  - name: webcontainer
+    image: prasad193/webnew:v1
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 80
+      name: apache
+      protocol: TCP
+    resources:
+          requests:
+            memory: "200Mi"
+            cpu: "200m"
+          limits:
+            memory: "300Mi"
+            cpu: "400m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webservice1
+  namespace: google
+spec:
+  type: LoadBalancer
+  ports:
+  - name: apache
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: web
+    env: dev
+
