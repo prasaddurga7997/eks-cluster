@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapplication
+  namespace: google
+  labels:
+    apptype: web
+    env: dev
+spec:
+  restartPolicy: OnFailure
+  initContainers:
+  - name: initcontainer
+    image: prasad193/webnew:v1
+    imagePullPolicy: Always
+    command: ["/bin/sh"]
+    args: ["-c", "curl https://www.googleadfsf.com"]
+  containers:
+    - name: webcontainer
+      image: httpd:latest
+      imagePullPolicy: Always
+      ports:
+        - containerPort: 80
+          name: apache
+          protocol: TCP
+      resources:
+        requests:
+          cpu: "200m"
+          memory: "200Mi"
+      limits:
+        cpu: "400m"
+        memory: "300Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webservice
+  namespace: google
+spec:
+  type: LoadBalancer
+  ports:
+    - name: apache
+      targetPort: 80
+      protocol: TCP
+  selector:
+    apptype: web
+    env: dev
