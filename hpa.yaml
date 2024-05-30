@@ -38,14 +38,14 @@ metadata:
   name: webservice
   namespace: google
 spec:
-  ports:
-  - name: apache
-    port: 80 #servicePort
-    containerPort: 80 #containerPort
-    protocol: TCP
-  selector:
-    apptype: web
-    env: dev
+ ports:
+ - name: apache
+   port: 80 #servicePort
+   targetPort: 80 #containerPort
+   protocol: TCP
+ selector:
+   apptype: web
+   env: dev
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -71,11 +71,11 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: webhpa
   namespace: google
-  spec:
-    maxReplicas: 3
-    minReplicas: 1
-    targetCPUUtilizationPercentage: 30
-    scaleTargetRef:
-      apiVersion: v1
-      kind: Deployment
-      name: webdeployment
+spec:
+  maxReplicas: 3
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 30
+  scaleTargetRef:
+    apiVersion: v1
+    kind: Deployment
+    name: webdeployment

@@ -4,7 +4,7 @@ metadata:
   name: webdeployment
   namespace: google
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       apptype: web
@@ -15,7 +15,8 @@ spec:
       labels:
         apptype: web
         env: dev
-    spec:
+  spec:
+    containers:
     - image: prasad193/webnew:v1
       name: webcontainer
       imagePullPolicy: Always
@@ -25,26 +26,26 @@ spec:
         protocol: TCP
       resources:
         requests:
-          memory: "40i"
-          cpu: "40m"
+        memory: "40i"
+        cpu: "40m"
         limits:
           memory: "50i"
           cpu: "50m"
 ---
 apiVersion: v1
-kind: service
+kind: Service
 metadata:
   name: webservice
   namespace: google
 spec:
-  ports:
-  - name: apache
-    port: 80 #ServicePort
-    targetPort: 80 #ContainerPort
-    protocol: TCP
-  selector:
-    apptype: web
-    env: dev
+ ports:
+ - name: apache
+   port: 80 #ServicePort
+   targetPort: 80 #ContainerPort
+   protocol: TCP
+ selector:
+   apptype: web
+   env: dev
 
 
 
