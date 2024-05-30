@@ -37,14 +37,14 @@ metadata:
   name: webservice
   namespace: google
 spec:
-  ports:
-  - name: apache
-    port: 80 #servicePort
-    targetPort: 80 #ContainerPort
-    protocol: TCP
-  selector: #mapping to pod
-    apptype: web
-    env: dev
+ ports:
+ - name: apache
+   port: 80 #servicePort
+   targetPort: 80 #ContainerPort
+   protocol: TCP
+ selector: #mapping to pod
+   apptype: web
+   env: dev
 ---
 apiVersion: apps/v1
 kind: Deployment
