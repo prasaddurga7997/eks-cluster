@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StateFulSet
+metadata:
+  name: mongoinstallation
+  namespace: google
+spec:
+  volumeClaimTemplates: #Reclaim Policy: Data will be added again whenever the pod is deleted
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 5Gi
+  replicas: 1
+  serviceName: mongoservice
+  selector:
+    matchLabels:
+      apptype: db
+      env: dev
+  template:
+    metadata:
+      name: dbtemp
+      labels:
+        apptype: db
+        env: dev
+    spec:
+      volumes:
+      - name: dbvolume
+        persistentVolumeClaim:
+          claimName: devpvc
+
+    containers:
+    - image: sudarshanlnx/mongo:latest
+      name: dbcon
+      imagePullPolicy: Always
+      ports:
+      - name: mongo
+        containerPort: 27017
+        protocol: TCP
+      volumeMounts:
+      - mountPath: /data/db
+        name: dbvolume
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongoservice
+  namespace: google
+spec:
+  ports:
+  - name: mongo
+    port: 27017
+    targetPort: 27017
+    protocol: TCP
+  selector:
+    apptype: db
+    env: dev
